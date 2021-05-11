@@ -85,4 +85,7 @@ void kernel::gerencia_processos()
     // FIFO
     esc.fifo();
 
+    // SJF
+    esc.sjf();
+
 }
