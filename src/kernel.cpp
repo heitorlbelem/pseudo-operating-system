@@ -2,11 +2,38 @@
 #include "escalonador.hpp"
 // construtor
 kernel::kernel() {
+    set_modo_operacao(0);
 }
 // destrutor
 kernel::~kernel() {
 
 }
+
+// metodos GET
+escalonador kernel::get_escalonador()
+{
+    return esc;
+}
+int kernel::get_modo_operacao()
+{
+    return modo_operacao;
+}
+
+// metodos SET
+
+void kernel::set_escalonador(escalonador esc_entrada)
+{
+    esc = esc_entrada;
+    return;
+}
+
+void kernel::set_modo_operacao(int modo_op)
+{
+    modo_operacao = modo_op;
+}
+
+
+// metodos diversos
 
 void kernel::verifica_entrada(int entrada, string arquivo)
 {
@@ -21,6 +48,7 @@ void kernel::verifica_entrada(int entrada, string arquivo)
             esc_temp = escalonador();
             esc_temp.le_arquivo_entrada(arquivo);
             set_escalonador(esc_temp);
+            set_modo_operacao(1);
             break;
         }
         case 2:
@@ -35,13 +63,26 @@ void kernel::verifica_entrada(int entrada, string arquivo)
 
 }
 
-escalonador kernel::get_escalonador()
+void kernel::verifica_modo_op(void)
 {
-    return esc;
+    switch(modo_operacao) {
+        case 1:
+            gerencia_processos();
+            break;
+        case 2:
+        // gerenciamento de memoria
+            break;
+        case 3:
+        // gerenciamneto de E/S
+            break;
+        default:
+            cout << "Tipo de arquivo incorreto!" << endl;
+    }
 }
 
-void kernel::set_escalonador(escalonador esc_entrada)
+void kernel::gerencia_processos()
 {
-    esc = esc_entrada;
-    return;
+    // FIFO
+    esc.fifo();
+
 }

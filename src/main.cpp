@@ -12,6 +12,7 @@ int main(int argc, char* argv[]) {
 	// inicializa o kernel
 	k = kernel();
 	k.verifica_entrada(atoi(argv[1]), argv[2]);
-	// verificar qual processo deve ser executado
+	// verificar qual processo deve ser executado e chama sua execucao
+	k.verifica_modo_op();
 	return 0;
 }
