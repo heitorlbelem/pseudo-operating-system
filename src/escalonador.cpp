@@ -30,6 +30,11 @@ estatisticas_processos escalonador::get_est_rr()
     return est_rr;
 }
 
+arquivo_saida escalonador::get_arquivo_saida()
+{
+    return texto_saida;
+}
+
 // metodos SET
 
 void escalonador::set_lista_processos(vector<pair<int, int>> lista)
@@ -51,6 +56,11 @@ void escalonador::set_est_sjf(estatisticas_processos est)
 void escalonador::set_est_rr(estatisticas_processos est)
 {
     est_rr = est;
+}
+
+void escalonador::set_arquivo_saida(arquivo_saida arq)
+{
+    texto_saida = arq;
 }
 
 // metodos diversos
@@ -81,7 +91,9 @@ void escalonador::fifo()
     vector<processo> processos_finalizados;
     processo p_temp;
     estatisticas_processos st_fifo;
-
+    string linha_temp;
+    vector<string> arq_temp;
+    arquivo_saida saida;
     // definindo a estrutura de dados que vai ordenar por ordem de chegada
     // nao importando a duracao do processo
     queue<processo> pq;
@@ -99,7 +111,7 @@ void escalonador::fifo()
 
     while( !(pq.empty()) ) {
         topo_fila = pq.front();
-        cout << topo_fila.chegada << " " << topo_fila.duracao << endl;
+        //cout << topo_fila.chegada << " " << topo_fila.duracao << endl;
         if( topo_fila.chegada > temp_execucao)
             temp_execucao = topo_fila.chegada;
         // atualiza o tmepo do inicio da execucao do processo
@@ -120,6 +132,9 @@ void escalonador::fifo()
         st_fifo.turnaround += (processos_finalizados[i].final_execucao - processos_finalizados[i].chegada);
         //cout << soma << endl;
         //cout << processos_finalizados[i].inicio_execucao << " " << processos_finalizados[i].chegada << endl;
+        linha_temp = "Rodou processo[" + to_string(processos_finalizados[i].id) + "] de [" + to_string(processos_finalizados[i].inicio_execucao) +"] ate [" + to_string(processos_finalizados[i].final_execucao) +"]" ;
+        //cout << linha_temp << endl;
+        arq_temp.push_back(linha_temp);
     }
     st_fifo.turnaround = st_fifo.turnaround/processos_finalizados.size();
     soma = soma/processos_finalizados.size();
@@ -131,6 +146,11 @@ void escalonador::fifo()
     // atualiza estrutura de estatisticas do escalonador
     set_est_fifo(st_fifo);
     cout << st_fifo.turnaround << " " << st_fifo.tempo_medio_resposta << " " << st_fifo.tempo_medio_espera << endl;
+    // escreve o historico de execucao dos processos
+    saida = get_arquivo_saida();
+    saida.saida_fifo = arq_temp;
+    // atualiza a estutura do escalonador
+    set_arquivo_saida(saida);
 
 }
 
@@ -139,10 +159,14 @@ void escalonador::sjf(void)
 {
     int tempo_execucao = 0;
     processo p_temp, topo_fila;
-    double soma;
+    double soma, espera, duracao, resposta = 0;
     vector<processo> processos_finalizados;
+    estatisticas_processos st_sjf;
     priority_queue<processo, vector<processo>, compare_fifo> pq;
     priority_queue<processo, vector<processo>, compare_sjf> fila_sjf;
+    string linha_temp;
+    vector<string> arq_temp;
+    arquivo_saida saida;
     // preenche a primeira fila de prioridade, ordenada pela ordem de chegada
     for(int i=0; i<lista_processos.size(); i++) {
         p_temp.chegada = lista_processos[i].first;
@@ -161,6 +185,7 @@ void escalonador::sjf(void)
         while( !(pq.empty()) ) {
             // loop para tratar os processos que chegam ao longo do tempo
             topo_fila = pq.top();
+            // verifica se o proximo processo da fila ja chegou para execucao (tempo total de execucao >= tempo de chegada do processo)
             if( topo_fila.chegada <= tempo_execucao ) {
                 fila_sjf.push(topo_fila);
                 pq.pop();
@@ -181,17 +206,61 @@ void escalonador::sjf(void)
         if(p_temp.inicio_execucao == -1) {
             p_temp.inicio_execucao = tempo_execucao;
         }
+        // remove o processo da fila apos sua execucao
         fila_sjf.pop();
+        // adiciona o tempo de execucao para o tempo total de processamento
         tempo_execucao += p_temp.duracao;
         p_temp.final_execucao = tempo_execucao;
+        // adiciona o processo para a lista de processos ja finalizados
         processos_finalizados.push_back(p_temp);  
 
     }
+    duracao = 0;
+    espera = 0;
     for(int i=0; i<processos_finalizados.size(); i++) {
-        soma += (processos_finalizados[i].final_execucao - processos_finalizados[i].chegada - processos_finalizados[i].duracao);
-        //st_fifo.turnaround += (processos_finalizados[i].final_execucao - processos_finalizados[i].chegada);
-        cout << processos_finalizados[i].inicio_execucao << " " << processos_finalizados[i].final_execucao << endl;
+        espera += (processos_finalizados[i].final_execucao - processos_finalizados[i].chegada - processos_finalizados[i].duracao);
+        duracao += processos_finalizados[i].duracao;
+        resposta += (processos_finalizados[i].inicio_execucao - processos_finalizados[i].chegada);
+        linha_temp = "Rodou processo[" + to_string(processos_finalizados[i].id) + "] de [" + to_string(processos_finalizados[i].inicio_execucao) +"] ate [" + to_string(processos_finalizados[i].final_execucao) +"]" ;
+        //st_sjf.turnaround += (processos_finalizados[i].final_execucao - processos_finalizados[i].chegada);
+        //cout << processos_finalizados[i].inicio_execucao << " " << processos_finalizados[i].final_execucao << endl;
+        arq_temp.push_back(linha_temp);
     }
-    soma = soma/processos_finalizados.size();
-    cout << soma << endl;
+    // calculando as estatísticas do sjf
+    espera = espera/processos_finalizados.size();
+    duracao = duracao/processos_finalizados.size();
+    resposta = resposta/processos_finalizados.size();
+    st_sjf.tempo_medio_espera = espera;
+    st_sjf.turnaround = duracao;
+    st_sjf.tempo_medio_resposta = resposta;
+    set_est_sjf(st_sjf);
+    cout << st_sjf.turnaround << " " << st_sjf.tempo_medio_resposta << " " << st_sjf.tempo_medio_espera << endl;
+
+    // escreve o historico de execucao dos processos
+    saida = get_arquivo_saida();
+    saida.saida_sjf = arq_temp;
+    // atualiza a estutura do escalonador
+    set_arquivo_saida(saida);
+    
+}
+
+void escalonador::escreve_historico_processos()
+{
+    arquivo_saida historico;
+    // Cria e abre o arquivo para escrita
+    ofstream MyFile("historico_processos.txt");
+
+    // Recupera a informacao sobre os arquivos
+    historico = get_arquivo_saida();
+    // escfrita do fifo
+    MyFile << "FIFO:\n";
+    for(int i=0; i<historico.saida_fifo.size(); i++)
+        MyFile << historico.saida_fifo[i] << "\n";
+
+    // escrita do sjf
+    MyFile << "\nSJF:\n";
+    for(int i=0; i<historico.saida_sjf.size(); i++)
+        MyFile << historico.saida_sjf[i] << "\n";
+    // Close the file
+    MyFile.close();
 }

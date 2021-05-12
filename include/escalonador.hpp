@@ -20,12 +20,19 @@ struct estatisticas_processos {
     double tempo_medio_espera;
 };
 
+struct arquivo_saida {
+    vector<string> saida_fifo;
+    vector<string> saida_sjf;
+    vector<string> saida_rr;
+};
+
 class escalonador {
     private:
         vector<pair<int, int>> lista_processos;
         estatisticas_processos est_fifo;
         estatisticas_processos est_sjf;
         estatisticas_processos est_rr;
+        arquivo_saida texto_saida;
     public:
     escalonador(); // construtor
     ~escalonador(); // destrutor
@@ -34,17 +41,20 @@ class escalonador {
     estatisticas_processos get_est_fifo();
     estatisticas_processos get_est_sjf();
     estatisticas_processos get_est_rr();
+    arquivo_saida get_arquivo_saida();
 
     // metodos SET
     void set_lista_processos(vector<pair<int, int>>);
     void set_est_fifo(estatisticas_processos);
     void set_est_sjf(estatisticas_processos);
     void set_est_rr(estatisticas_processos);
+    void set_arquivo_saida(arquivo_saida);
     // metodos diversos
     void fifo();
     void le_arquivo_entrada(string);
     void sjf(void);
     void sjf_preemptivo(void);
+    void escreve_historico_processos();
     
 };
 

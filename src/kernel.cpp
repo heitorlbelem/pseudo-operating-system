@@ -87,5 +87,7 @@ void kernel::gerencia_processos()
 
     // SJF
     esc.sjf();
+    // escreve arquivo de saida
+    esc.escreve_historico_processos();
 
 }
