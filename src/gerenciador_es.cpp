@@ -138,5 +138,6 @@ void ordenaSCAN(std::vector<int>& vector_ordenado, std::vector<int> vector_entra
     sort(vector_entrada.begin(), vector_entrada.end());
     it_endereco_inicial = find(vector_entrada.begin(), vector_entrada.end(), endereco_inicial)+1;
     sort(vector_entrada.begin(), it_endereco_inicial, std::greater<int>());
+    vector_entrada.insert(it_endereco_inicial, 0);
     vector_ordenado = vector_entrada;
 }
