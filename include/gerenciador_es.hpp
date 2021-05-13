@@ -26,9 +26,30 @@ class GerenciadorES {
     public:
     GerenciadorES(); // construtor
     ~GerenciadorES(); // destrutor
+
+    /* 
+        Lê um arquivo no caminho de entrada com endereços de cilindros
+        Imprime na tela distâncias percorridas com diferentes algoritmos.
+    */
     void imprimeDistanciaPercorrida(std::string);
 };
 
+/*
+    Percorre um vector de inteiros calculando a distancia entre cada endereço
+    adjascente e retorna o total percorrido.
+*/
 int calculaDistanciaPercorrida(std::vector<int>);
-void ordenaSSTF(std::vector<int>& , std::vector<int>);
+
+/*
+    Ordena sempre a requisição que precisar do menor
+    deslocamento do braço, de forma a minimizar o tempo de seek
+*/
+void ordenaSSTF(std::vector<int>&, std::vector<int>);
+
+/*
+    Ordena continuamente para frente e para trás,
+    atendendo aos pedidos na direção da movimentação de uma
+    extremidade para a outra.
+*/
+void ordenaSCAN(std::vector<int>&, std::vector<int>);
 #endif

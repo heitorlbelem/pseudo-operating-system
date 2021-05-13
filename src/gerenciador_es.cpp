@@ -5,6 +5,8 @@
 #include <iostream>
 #include <vector>
 #include <cstdlib>
+#include <bits/stdc++.h>
+#include <algorithm>
 
 std::ifstream t("file.txt");
 
@@ -17,56 +19,59 @@ GerenciadorES::~GerenciadorES() {
 
 }
 
-void GerenciadorES::imprimeDistanciaPercorrida(std::string nomeArquivo )
+void GerenciadorES::imprimeDistanciaPercorrida(std::string nome_arquivo )
 {   
     // Lendo arquivo de texto
-    std::ifstream streamArquivo(nomeArquivo);
-    std::string entradaLida(
-        (std::istreambuf_iterator<char>(streamArquivo)),
+    std::ifstream stream_arquivo(nome_arquivo);
+    std::string entrada_lida(
+        (std::istreambuf_iterator<char>(stream_arquivo)),
             std::istreambuf_iterator<char>());
 
     // Divide números em vetores correspondentes
-    std::string s = entradaLida;
+    std::string s = entrada_lida;
     std::string delimitador = "\n";
 
     size_t pos = 0;
-    std::vector<int> enderecosCilindrosListados, enderecosTemporarios;
-    std::vector<int> enderecosSSTF;
-    std::string token;
-    int numero_token, ultimo_endereco_visitado, ultima_distancia_medida;
-    int endereco_menor_distancia;
-    int distancia_fcfs, distancia_sstf, distancia_scan, distancia_medida;
+    std::vector<int> enderecos_cilindros_listados;
+    std::vector<int> enderecos_sstf, enderecos_scan;
+    std::string palavra_temporaria;
+    int numero_temporario;
+    int distancia_fcfs, distancia_sstf, distancia_scan;
     int tamanho_disco;
 
     while ((pos = s.find(delimitador)) != std::string::npos) {
-        token = s.substr(0, pos);
-        numero_token = atoi(token.c_str());
-        enderecosCilindrosListados.push_back(numero_token);
+        palavra_temporaria = s.substr(0, pos);
+        numero_temporario = atoi(palavra_temporaria.c_str());
+        enderecos_cilindros_listados.push_back(numero_temporario);
         s.erase(0, pos + delimitador.length());
     }
-    numero_token = atoi(s.c_str());
-    enderecosCilindrosListados.push_back(numero_token);
-    tamanho_disco = enderecosCilindrosListados.at(0);
-    enderecosCilindrosListados.erase(enderecosCilindrosListados.begin());
+    numero_temporario = atoi(s.c_str());
+    enderecos_cilindros_listados.push_back(numero_temporario);
+
+    tamanho_disco = enderecos_cilindros_listados.at(0);
+    enderecos_cilindros_listados.erase(enderecos_cilindros_listados.begin());
 
     // Calculando distancia FCFS
-    distancia_fcfs = calculaDistanciaPercorrida(enderecosCilindrosListados);
+    distancia_fcfs = calculaDistanciaPercorrida(enderecos_cilindros_listados);
 
     // Ordenando endereços como SSFT
-    ordenaSSTF(enderecosSSTF, enderecosCilindrosListados);
+    ordenaSSTF(enderecos_sstf, enderecos_cilindros_listados);
 
     // Calculando distancia SSFT
-    distancia_sstf = calculaDistanciaPercorrida(enderecosSSTF);
+    distancia_sstf = calculaDistanciaPercorrida(enderecos_sstf);
+
+    // Ordenando endereços como SCAN
+    ordenaSCAN(enderecos_scan, enderecos_cilindros_listados);
+
+    // Calculando distancia SSFT
+    distancia_scan = calculaDistanciaPercorrida(enderecos_scan);
     
-    std::cout << "SSTF\t" << distancia_sstf << std::endl;
     std::cout << "FCFS\t" << distancia_fcfs << std::endl;
+    std::cout << "SSTF\t" << distancia_sstf << std::endl;
+    std::cout << "SCAN\t" << distancia_scan << std::endl;
 }
 
 
-/*
-    Percorre um vector de inteiros calculando a distancia entre cada endereço
-    adjascente e retorna o total percorrido.
-*/
 int calculaDistanciaPercorrida(std::vector<int> vector_caminho_percorrido)
 {
     int distancia_percorrida = 0;
@@ -89,10 +94,7 @@ int calculaDistanciaPercorrida(std::vector<int> vector_caminho_percorrido)
 
 }
 
-/*
-    Ordena sempre a requisição que precisar do menor
-    deslocamento do braço, de forma a minimizar o tempo de seek
-*/
+
 void ordenaSSTF(std::vector<int>& vector_ordenado, std::vector<int> vector_entrada )
 {   
     int ultimo_endereco_avaliado, ultima_distancia_medida, endereco_menor_distancia;
@@ -125,4 +127,16 @@ void ordenaSSTF(std::vector<int>& vector_ordenado, std::vector<int> vector_entra
         ultimo_endereco_avaliado = endereco_menor_distancia;
         vector_ordenado.push_back(endereco_menor_distancia);
     }
+}
+
+
+void ordenaSCAN(std::vector<int>& vector_ordenado, std::vector<int> vector_entrada )
+{
+    std::vector<int>::iterator it_endereco_inicial;
+    int endereco_inicial = *vector_entrada.begin();
+    
+    sort(vector_entrada.begin(), vector_entrada.end());
+    it_endereco_inicial = find(vector_entrada.begin(), vector_entrada.end(), endereco_inicial)+1;
+    sort(vector_entrada.begin(), it_endereco_inicial, std::greater<int>());
+    vector_ordenado = vector_entrada;
 }
