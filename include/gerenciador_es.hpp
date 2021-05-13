@@ -17,6 +17,7 @@ atender todas as requisições solicitadas utilizando cada um dos algoritmos.
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 class GerenciadorES {
     
@@ -28,5 +29,6 @@ class GerenciadorES {
     void imprimeDistanciaPercorrida(std::string);
 };
 
-
+int calculaDistanciaPercorrida(std::vector<int>);
+void ordenaSSTF(std::vector<int>& , std::vector<int>);
 #endif

@@ -50,69 +50,79 @@ void GerenciadorES::imprimeDistanciaPercorrida(std::string nomeArquivo )
     enderecosCilindrosListados.erase(enderecosCilindrosListados.begin());
 
     // Calculando distancia FCFS
-    distancia_fcfs = 0;
-    ultimo_endereco_visitado = -1;
-    for(std::vector<int>::iterator it = enderecosCilindrosListados.begin();
-    it != enderecosCilindrosListados.end(); 
-     ++it) {
-        numero_token = *it;
-        if( ultimo_endereco_visitado == -1)
-        {
-            ultimo_endereco_visitado = numero_token;
-        } else {
-            distancia_fcfs += abs(numero_token - ultimo_endereco_visitado);
-            ultimo_endereco_visitado = numero_token;
-        }
-    }
+    distancia_fcfs = calculaDistanciaPercorrida(enderecosCilindrosListados);
 
     // Ordenando endereços como SSFT
+    ordenaSSTF(enderecosSSTF, enderecosCilindrosListados);
+
+    // Calculando distancia SSFT
+    distancia_sstf = calculaDistanciaPercorrida(enderecosSSTF);
+    
+    std::cout << "SSTF\t" << distancia_sstf << std::endl;
+    std::cout << "FCFS\t" << distancia_fcfs << std::endl;
+}
+
+
+/*
+    Percorre um vector de inteiros calculando a distancia entre cada endereço
+    adjascente e retorna o total percorrido.
+*/
+int calculaDistanciaPercorrida(std::vector<int> vector_caminho_percorrido)
+{
+    int distancia_percorrida = 0;
+    int endereco_cilindro_atual;
+    int ultimo_endereco_visitado = -1;
+
+    for(std::vector<int>::iterator it = vector_caminho_percorrido.begin();
+        it != vector_caminho_percorrido.end(); 
+        ++it) {
+        endereco_cilindro_atual = *it;
+        if( ultimo_endereco_visitado == -1)
+        {
+            ultimo_endereco_visitado = endereco_cilindro_atual;
+        } else {
+            distancia_percorrida += abs(endereco_cilindro_atual - ultimo_endereco_visitado);
+            ultimo_endereco_visitado = endereco_cilindro_atual;
+        }
+    }
+    return distancia_percorrida;
+
+}
+
+/*
+    Ordena sempre a requisição que precisar do menor
+    deslocamento do braço, de forma a minimizar o tempo de seek
+*/
+void ordenaSSTF(std::vector<int>& vector_ordenado, std::vector<int> vector_entrada )
+{   
+    int ultimo_endereco_avaliado, ultima_distancia_medida, endereco_menor_distancia;
+    int distancia_medida;
     std::vector<int>::iterator ultimo_iterador_escolhido;
-    enderecosTemporarios = enderecosCilindrosListados;
-    enderecosTemporarios.erase(enderecosTemporarios.begin());
+    std::vector<int> vector_enderecos_temporario;
 
-    numero_token = *enderecosCilindrosListados.begin();
-    enderecosSSTF.push_back(numero_token);
+    vector_enderecos_temporario = vector_entrada;
+    vector_enderecos_temporario.erase(vector_enderecos_temporario.begin());
 
-    for(std::size_t i=1; i < enderecosCilindrosListados.size(); ++i) {
-        ultima_distancia_medida = tamanho_disco+1;
+    ultimo_endereco_avaliado = *vector_entrada.begin();
+    vector_ordenado.push_back(ultimo_endereco_avaliado);
+
+    for(std::size_t i=1; i < vector_entrada.size(); ++i) {
+        ultima_distancia_medida = -1;
         endereco_menor_distancia = -1;
 
-        for(std::vector<int>::iterator it_endereco_comparado = enderecosTemporarios.begin();
-            it_endereco_comparado != enderecosTemporarios.end(); 
+        for(std::vector<int>::iterator it_endereco_comparado = vector_enderecos_temporario.begin();
+            it_endereco_comparado != vector_enderecos_temporario.end(); 
             ++it_endereco_comparado) {
-            distancia_medida = abs(*it_endereco_comparado - numero_token);
-            if(distancia_medida != 0 && ultima_distancia_medida > distancia_medida)
+            distancia_medida = abs(*it_endereco_comparado - ultimo_endereco_avaliado);
+            if(ultima_distancia_medida > distancia_medida || ultima_distancia_medida == -1)
             {   
                 ultimo_iterador_escolhido = it_endereco_comparado;
                 endereco_menor_distancia = *it_endereco_comparado;
                 ultima_distancia_medida = distancia_medida;
             }
         }
-        enderecosTemporarios.erase(ultimo_iterador_escolhido);
-        if(endereco_menor_distancia > -1)
-        {
-            numero_token = endereco_menor_distancia;
-            enderecosSSTF.push_back(endereco_menor_distancia);
-        }
-        std::cout << "SSTF\t" << endereco_menor_distancia << std::endl;
+        vector_enderecos_temporario.erase(ultimo_iterador_escolhido);
+        ultimo_endereco_avaliado = endereco_menor_distancia;
+        vector_ordenado.push_back(endereco_menor_distancia);
     }
-
-    // Calculando distancia SSFT
-    distancia_sstf = 0;
-    ultimo_endereco_visitado = -1;
-    for(std::vector<int>::iterator it = enderecosSSTF.begin();
-    it != enderecosSSTF.end(); 
-     ++it) {
-        numero_token = *it;
-        if( ultimo_endereco_visitado == -1)
-        {
-            ultimo_endereco_visitado = numero_token;
-        } else {
-            distancia_sstf += abs(numero_token - ultimo_endereco_visitado);
-            ultimo_endereco_visitado = numero_token;
-        }
-    }
-    
-    std::cout << "SSTF\t" << distancia_sstf << std::endl;
-    std::cout << "FCFS\t" << distancia_fcfs << std::endl;
 }
