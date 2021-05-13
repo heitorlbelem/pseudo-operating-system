@@ -54,6 +54,7 @@ class escalonador {
     void le_arquivo_entrada(string);
     void sjf(void);
     void sjf_preemptivo(void);
+    void roundrobin(int);
     void escreve_historico_processos();
     
 };
@@ -61,8 +62,10 @@ class escalonador {
 struct compare_fifo {
     bool operator()(processo const& p1, processo const& p2)
     {
-        // return "true" if "p1" is ordered
-        // before "p2", for example:
+        // caso o tempo de chegada dos processos seja igual, ordena pela ordem de leitura do arquivo (crescente)
+        // Caso constrario, ordena pela ordem de chegada
+        if(p1.chegada == p2.chegada)
+            return p1.id > p2.id;
         return p1.chegada > p2.chegada;
     }
 };

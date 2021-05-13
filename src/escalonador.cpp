@@ -244,6 +244,83 @@ void escalonador::sjf(void)
     
 }
 
+void escalonador::roundrobin(int quantum)
+{
+    int tempo_execucao = 0;
+    processo p_temp, topo_fila;
+    double soma, espera, duracao, resposta = 0;
+    vector<processo> processos_finalizados;
+    estatisticas_processos st_sjf;
+    priority_queue<processo, vector<processo>, compare_fifo> pq;
+    queue<processo> fila_rr;
+    string linha_temp;
+    vector<string> arq_temp;
+    arquivo_saida saida;
+    // preenche a primeira fila de prioridade, ordenada pela ordem de chegada
+    for(int i=0; i<lista_processos.size(); i++) {
+        p_temp.chegada = lista_processos[i].first;
+        p_temp.duracao = lista_processos[i].second;
+        p_temp.restante = lista_processos[i].second;
+        p_temp.inicio_execucao = -1;
+        p_temp.final_execucao = 0;
+        p_temp.id = i;
+        pq.push(p_temp);
+    }
+     while(1) {
+        while( !(pq.empty()) ) {
+            // loop para tratar os processos que chegam ao longo do tempo
+            topo_fila = pq.top();
+            // verifica se o proximo processo da fila ja chegou para execucao (tempo total de execucao >= tempo de chegada do processo)
+            if( topo_fila.chegada <= tempo_execucao ) {
+                fila_rr.push(topo_fila);
+                cout << topo_fila.chegada << " " << topo_fila.duracao << endl;
+                pq.pop();
+            }
+            else {
+                // sai do loop dos elementos que estao para chegar
+                break;
+            }
+        }
+        // caso a fila esteja vazia deve encerrar o loop
+        if(fila_rr.empty())
+            break;
+
+        p_temp = fila_rr.front();
+        // verifica se eh o inicio da exec do processo
+        if(p_temp.inicio_execucao == -1) {
+            p_temp.inicio_execucao = tempo_execucao;
+        }
+        // remove o elemento da fila
+        fila_rr.pop();
+        // verifica se o processo vai executar pela duracao total do quantum
+        if(p_temp.restante >= quantum) {
+            linha_temp = "Rodou processo[" + to_string(p_temp.id) + "] de [" + to_string(tempo_execucao) +"] ate [" + to_string(tempo_execucao+quantum) +"]" ;
+            p_temp.restante -= quantum;
+            tempo_execucao += quantum;
+        }
+        else {
+            linha_temp = "Rodou processo[" + to_string(p_temp.id) + "] de [" + to_string(tempo_execucao) +"] ate [" + to_string(tempo_execucao+p_temp.restante) +"]" ;
+            tempo_execucao += p_temp.restante;
+            p_temp.restante = 0;
+        }
+        arq_temp.push_back(linha_temp);
+        // caso ja tenha executado o processo ate o fim, nao o coloca na fila de pronto novamente
+        if(p_temp.restante != 0)
+            fila_rr.push(p_temp);
+        else {
+            p_temp.final_execucao = tempo_execucao;
+            // adiciona o processo aos finalizados
+            processos_finalizados.push_back(p_temp);
+        }
+         
+    }
+    // escreve o historico de execucao dos processos
+    saida = get_arquivo_saida();
+    saida.saida_rr = arq_temp;
+    // atualiza a estutura do escalonador
+    set_arquivo_saida(saida);
+}
+
 void escalonador::escreve_historico_processos()
 {
     arquivo_saida historico;
@@ -261,6 +338,11 @@ void escalonador::escreve_historico_processos()
     MyFile << "\nSJF:\n";
     for(int i=0; i<historico.saida_sjf.size(); i++)
         MyFile << historico.saida_sjf[i] << "\n";
+    
+    // escrita do round robin
+    MyFile << "\nRound Robin:\n";
+    for(int i=0; i<historico.saida_rr.size(); i++)
+        MyFile << historico.saida_rr[i] << "\n";
     // Close the file
     MyFile.close();
 }
