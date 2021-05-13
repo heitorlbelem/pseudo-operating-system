@@ -1,5 +1,7 @@
 #include "kernel.hpp"
 #include "escalonador.hpp"
+#include "gerenciador_es.hpp"
+
 // construtor
 kernel::kernel() {
     set_modo_operacao(0);
@@ -14,6 +16,12 @@ escalonador kernel::get_escalonador()
 {
     return esc;
 }
+
+GerenciadorES kernel::gerenciadorES()
+{
+    return gerenciadorES_;
+}
+
 int kernel::get_modo_operacao()
 {
     return modo_operacao;
@@ -27,6 +35,12 @@ void kernel::set_escalonador(escalonador esc_entrada)
     return;
 }
 
+void kernel::setGerenciadorES(GerenciadorES gerenciadorES_entrada)
+{
+    gerenciadorES_ = gerenciadorES_entrada;
+    return;
+}
+
 void kernel::set_modo_operacao(int modo_op)
 {
     modo_operacao = modo_op;
@@ -37,6 +51,7 @@ void kernel::set_modo_operacao(int modo_op)
 
 void kernel::verifica_entrada(int entrada, string arquivo)
 {
+    GerenciadorES gerenciador_entrada_saida;
     switch(entrada) {
         case 1:
         {
@@ -56,6 +71,10 @@ void kernel::verifica_entrada(int entrada, string arquivo)
             break;
         case 3:
         // gerenciamneto de E/S
+        // chamar funcao de ler arquivo de processos
+            gerenciador_entrada_saida = GerenciadorES();
+            setGerenciadorES(gerenciador_entrada_saida);
+            gerenciador_entrada_saida.imprimeDistanciaPercorrida(arquivo);
             break;
         default:
             cout << "Tipo de arquivo incorreto!" << endl;

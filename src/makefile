@@ -7,10 +7,10 @@ LDIR =../lib
 
 LIBS=-lm -lstdc++
 
-_DEPS = escalonador.hpp kernel.hpp
+_DEPS = escalonador.hpp kernel.hpp gerenciador_es.hpp
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o escalonador.o kernel.o
+_OBJ = main.o escalonador.o kernel.o gerenciador_es.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 

@@ -25,7 +25,7 @@ class GerenciadorES {
     public:
     GerenciadorES(); // construtor
     ~GerenciadorES(); // destrutor
-    void imprime_distancia_percorrida(std::string);
+    void imprimeDistanciaPercorrida(std::string);
 };
 
 
