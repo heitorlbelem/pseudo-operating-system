@@ -67,5 +67,32 @@ void gerenciador_mem::fifo() {
     estat = get_estatisticas();
     estat.fifo_pf = page_fault;
     set_estatisticas(estat);
+}
+
+void gerenciador_mem::sc() {
+
+    int page_fault = 0;
+    vector<pair<int,int>> frames;
+    deque<pair<int,int>>::iterator it_verificador;
+    estatisticas_paginacao estat;
+    int found = -1;
+
+    for(int i=0; i < pages.size(); i++) {
+        int current_page = pages[i];
+
+        // se memoria estiver cheia remove o frame mais antigo
+        if(frames.size() == qt_frames){
+            found = find_value(frames, current_page);
+            if (found != -1) {
+                page_fault ++;
+                frames.erase(frames.begin() + found);
+            }
+        }
+        // se ainda tiver memória livre, acrescenta o contador de page_fault e adiciona o frame na memória
+        else {
+            page_fault++;
+            frames.push_back(make_pair(current_page,0));
+        }
+    }
 
 }
