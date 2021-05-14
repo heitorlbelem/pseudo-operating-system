@@ -1,9 +1,11 @@
 #include <bits/stdc++.h>
 #include "kernel.hpp"
+#include <cstdio>
 
 int main(int argc, char* argv[]) {
 	kernel k;
 	escalonador esc_1;
+
 	// teste master
 	if(argc != 3) {
 		printf("Parametros de entrada incorretos!\n");
