@@ -103,8 +103,13 @@ void kernel::gerencia_processos()
 {
     // FIFO
     esc.fifo();
-
     // SJF
     esc.sjf();
+    // Round RObin
+    esc.roundrobin(2);
+    // PRINTA ESTATISTICAS
+    esc.mostra_estatisticas();
+    // escreve arquivo de saida
+    esc.escreve_historico_processos();
 
 }
