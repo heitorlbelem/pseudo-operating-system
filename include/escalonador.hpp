@@ -34,28 +34,29 @@ class escalonador {
         estatisticas_processos est_rr;
         arquivo_saida texto_saida;
     public:
-    escalonador(); // construtor
-    ~escalonador(); // destrutor
-    // metodos GET
-    vector<pair<int, int>> get_lista_processos(void);
-    estatisticas_processos get_est_fifo();
-    estatisticas_processos get_est_sjf();
-    estatisticas_processos get_est_rr();
-    arquivo_saida get_arquivo_saida();
+        escalonador(); // construtor
+        ~escalonador(); // destrutor
+        // metodos GET
+        vector<pair<int, int>> get_lista_processos(void);
+        estatisticas_processos get_est_fifo();
+        estatisticas_processos get_est_sjf();
+        estatisticas_processos get_est_rr();
+        arquivo_saida get_arquivo_saida();
 
-    // metodos SET
-    void set_lista_processos(vector<pair<int, int>>);
-    void set_est_fifo(estatisticas_processos);
-    void set_est_sjf(estatisticas_processos);
-    void set_est_rr(estatisticas_processos);
-    void set_arquivo_saida(arquivo_saida);
-    // metodos diversos
-    void fifo();
-    void le_arquivo_entrada(string);
-    void sjf(void);
-    void sjf_preemptivo(void);
-    void roundrobin(int);
-    void escreve_historico_processos();
+        // metodos SET
+        void set_lista_processos(vector<pair<int, int>>);
+        void set_est_fifo(estatisticas_processos);
+        void set_est_sjf(estatisticas_processos);
+        void set_est_rr(estatisticas_processos);
+        void set_arquivo_saida(arquivo_saida);
+        // metodos diversos
+        void fifo();
+        void le_arquivo_entrada(string);
+        void sjf(void);
+        void sjf_preemptivo(void);
+        void roundrobin(int);
+        void escreve_historico_processos();
+        void mostra_estatisticas();
     
 };
 

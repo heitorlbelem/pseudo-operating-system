@@ -145,7 +145,7 @@ void escalonador::fifo()
 
     // atualiza estrutura de estatisticas do escalonador
     set_est_fifo(st_fifo);
-    cout << st_fifo.turnaround << " " << st_fifo.tempo_medio_resposta << " " << st_fifo.tempo_medio_espera << endl;
+    //cout << st_fifo.turnaround << " " << st_fifo.tempo_medio_resposta << " " << st_fifo.tempo_medio_espera << endl;
     // escreve o historico de execucao dos processos
     saida = get_arquivo_saida();
     saida.saida_fifo = arq_temp;
@@ -219,7 +219,7 @@ void escalonador::sjf(void)
     espera = 0;
     for(int i=0; i<processos_finalizados.size(); i++) {
         espera += (processos_finalizados[i].final_execucao - processos_finalizados[i].chegada - processos_finalizados[i].duracao);
-        duracao += processos_finalizados[i].duracao;
+        duracao += processos_finalizados[i].final_execucao - processos_finalizados[i].chegada;
         resposta += (processos_finalizados[i].inicio_execucao - processos_finalizados[i].chegada);
         linha_temp = "Rodou processo[" + to_string(processos_finalizados[i].id) + "] de [" + to_string(processos_finalizados[i].inicio_execucao) +"] ate [" + to_string(processos_finalizados[i].final_execucao) +"]" ;
         //st_sjf.turnaround += (processos_finalizados[i].final_execucao - processos_finalizados[i].chegada);
@@ -234,7 +234,7 @@ void escalonador::sjf(void)
     st_sjf.turnaround = duracao;
     st_sjf.tempo_medio_resposta = resposta;
     set_est_sjf(st_sjf);
-    cout << st_sjf.turnaround << " " << st_sjf.tempo_medio_resposta << " " << st_sjf.tempo_medio_espera << endl;
+    //cout << st_sjf.turnaround << " " << st_sjf.tempo_medio_resposta << " " << st_sjf.tempo_medio_espera << endl;
 
     // escreve o historico de execucao dos processos
     saida = get_arquivo_saida();
@@ -248,9 +248,9 @@ void escalonador::roundrobin(int quantum)
 {
     int tempo_execucao = 0;
     processo p_temp, topo_fila;
-    double soma, espera, duracao, resposta = 0;
+    double soma=0, espera=0, duracao=0, resposta = 0;
     vector<processo> processos_finalizados;
-    estatisticas_processos st_sjf;
+    estatisticas_processos st_rr;
     priority_queue<processo, vector<processo>, compare_fifo> pq;
     queue<processo> fila_rr;
     string linha_temp;
@@ -273,7 +273,7 @@ void escalonador::roundrobin(int quantum)
             // verifica se o proximo processo da fila ja chegou para execucao (tempo total de execucao >= tempo de chegada do processo)
             if( topo_fila.chegada <= tempo_execucao ) {
                 fila_rr.push(topo_fila);
-                cout << topo_fila.chegada << " " << topo_fila.duracao << endl;
+                //cout << topo_fila.chegada << " " << topo_fila.duracao << endl;
                 pq.pop();
             }
             else {
@@ -314,6 +314,20 @@ void escalonador::roundrobin(int quantum)
         }
          
     }
+    // gera as estatisticas
+    for(int i=0; i<processos_finalizados.size(); i++) {
+        espera += (processos_finalizados[i].final_execucao - processos_finalizados[i].chegada - processos_finalizados[i].duracao);
+        duracao += processos_finalizados[i].final_execucao - processos_finalizados[i].chegada;
+        resposta += (processos_finalizados[i].inicio_execucao - processos_finalizados[i].chegada);
+        
+    }
+    espera = espera/processos_finalizados.size();
+    duracao = duracao/processos_finalizados.size();
+    resposta = resposta/processos_finalizados.size();
+    st_rr.tempo_medio_espera = espera;
+    st_rr.turnaround = duracao;
+    st_rr.tempo_medio_resposta = resposta;
+    set_est_rr(st_rr);
     // escreve o historico de execucao dos processos
     saida = get_arquivo_saida();
     saida.saida_rr = arq_temp;
@@ -345,4 +359,11 @@ void escalonador::escreve_historico_processos()
         MyFile << historico.saida_rr[i] << "\n";
     // Close the file
     MyFile.close();
+}
+
+void escalonador::mostra_estatisticas()
+{
+    cout << "FIFO "<<est_fifo.turnaround << " " << est_fifo.tempo_medio_resposta << " " << est_fifo.tempo_medio_espera << endl;
+    cout << "SJF "<<est_sjf.turnaround << " " << est_sjf.tempo_medio_resposta << " " << est_sjf.tempo_medio_espera << endl;
+    cout << "ROUND ROBIN "<<est_rr.turnaround << " " << est_rr.tempo_medio_resposta << " " << est_rr.tempo_medio_espera << endl;
 }
