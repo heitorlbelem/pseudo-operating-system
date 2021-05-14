@@ -4,6 +4,7 @@
 #include <bits/stdc++.h>
 #include "escalonador.hpp"
 #include "gerenciador_es.hpp"
+#include "gerenciador_mem.hpp"
 
 using namespace std;
 
@@ -15,26 +16,34 @@ class kernel {
      * 2 -> Gerenciamento de Memoria
      * 3 -> Gerenciamento de E/S
      */
+    int modo_operacao;
     escalonador esc;
+    gerenciador_mem g_memoria;
     /* Simula o funcionamento de algoritmos de gerencia de disco
     */
     GerenciadorES gerenciadorES_;
-    int modo_operacao;
+
     public:
     kernel(); // construtor
     ~kernel(); // destrutor
+    
     // metodos GET
+    int get_modo_operacao();
     escalonador get_escalonador(void);
     GerenciadorES gerenciadorES(void);
-    int get_modo_operacao();
+    gerenciador_mem get_gerenciador_mem(void);
+    
     // metodos SET
     void set_modo_operacao(int);
     void set_escalonador(escalonador);
     void setGerenciadorES(GerenciadorES);
+    void set_gerenciador_mem(gerenciador_mem);
+
     // metodos diversos
     void verifica_entrada(int , string);
     void verifica_modo_op(void);
     void gerencia_processos();
+    void gerencia_memoria();
 };
 
 
