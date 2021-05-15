@@ -15,10 +15,10 @@ int find_sc(vector<pair<int, int>> &elements, int current) {
         // se encontrar o frame que está para ser inserido, retorna -1 pois não
         // precisa remover nenhum para colocar o atual. (NÃO TEM PAGE FAULT)
         if(elements[i].first == current) {
-            elements[i].second = 1;
+            elements[i].second = 2;
             return -1;
         }
-
+        elements[i].second--;
         // se não for o mesmo frame que quer adicionar, verifica o bit R
         // se for 0, adiciona a posição do frame na lista de valores que podem ser removidos
         if(elements[i].second == 0) {
@@ -113,11 +113,10 @@ void gerenciador_mem::fifo() {
 void gerenciador_mem::sc() {
 
     int page_fault = 0;
-    vector<pair<int,int>> frames;
-    deque<pair<int,int>>::iterator it_verificador;
-    estatisticas_paginacao estat;
     int found = -1;
     int max_references = 0;
+    vector<pair<int,int>> frames;
+    estatisticas_paginacao estat;
 
     for(int i=0; i < pages.size(); i++) {
         int current_page = pages[i];
@@ -130,7 +129,7 @@ void gerenciador_mem::sc() {
             if (found != -1) {
                 page_fault++;
                 frames.erase(frames.begin() + found);
-                frames.push_back(make_pair(current_page,1));
+                frames.push_back(make_pair(current_page, 2));
             }
         }
         // se ainda tiver espaço livre na memória
@@ -138,15 +137,11 @@ void gerenciador_mem::sc() {
             // se não encontrou a página na memória, incrementa o page fault e adiciona a página nova na memória
             if(found != -1) {
                 page_fault++;
-                frames.push_back(make_pair(current_page,1));
+                frames.push_back(make_pair(current_page, 2));
             }
         }
 
-        max_references++;
-        if(max_references == 2) {
-            reset_bit_R(frames);
-            max_references = 0;
-        }
+        
     }
 
     estat = get_estatisticas();
