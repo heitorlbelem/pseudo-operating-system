@@ -96,7 +96,7 @@ void escalonador::fifo()
     arquivo_saida saida;
     // definindo a estrutura de dados que vai ordenar por ordem de chegada
     // nao importando a duracao do processo
-    queue<processo> pq;
+    priority_queue<processo, vector<processo>, compare_fifo> pq;
     //priority_queue<processo, vector<processo>, compare_fifo> pq;
     processo topo_fila;
     // insere os elementos na fila para serem escalonados
@@ -110,7 +110,7 @@ void escalonador::fifo()
     }
 
     while( !(pq.empty()) ) {
-        topo_fila = pq.front();
+        topo_fila = pq.top();
         //cout << topo_fila.chegada << " " << topo_fila.duracao << endl;
         // caso a cpu fique em tempo ocioso (chegada do proximo processo eh maior que o tempo de execucao)
         // atualiza o tempo de execucao para a chegada do proximo processo
