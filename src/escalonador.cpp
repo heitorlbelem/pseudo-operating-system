@@ -112,6 +112,8 @@ void escalonador::fifo()
     while( !(pq.empty()) ) {
         topo_fila = pq.front();
         //cout << topo_fila.chegada << " " << topo_fila.duracao << endl;
+        // caso a cpu fique em tempo ocioso (chegada do proximo processo eh maior que o tempo de execucao)
+        // atualiza o tempo de execucao para a chegada do proximo processo
         if( topo_fila.chegada > temp_execucao)
             temp_execucao = topo_fila.chegada;
         // atualiza o tmepo do inicio da execucao do processo
@@ -197,11 +199,20 @@ void escalonador::sjf(void)
                 break;
             }
         }
+        // caso a cpu fique em tempo ocioso (chegada do proximo processo eh maior que o tempo de execucao)
+        // atualiza o tempo de execucao para a chegada do proximo processo
+        if(fila_sjf.empty() and !(pq.empty())) {
+            topo_fila = pq.top();
+            tempo_execucao = topo_fila.chegada;
+            fila_sjf.push(topo_fila);
+            pq.pop();
+        }
         // caso a fila esteja vazia deve encerrar o loop
         if(fila_sjf.empty())
             break;
 
         p_temp = fila_sjf.top();
+
         // verifica se eh o inicio da exec do processo
         if(p_temp.inicio_execucao == -1) {
             p_temp.inicio_execucao = tempo_execucao;
@@ -266,6 +277,9 @@ void escalonador::roundrobin(int quantum)
         p_temp.id = i;
         pq.push(p_temp);
     }
+    // coloca um id inexsitente apenas para saber quando é a primeira execucao de um processe
+    // Para evitar adicionar o processo inicial 2x a fila de execucao
+    p_temp.id = -1;
      while(1) {
         while( !(pq.empty()) ) {
             // loop para tratar os processos que chegam ao longo do tempo
@@ -281,11 +295,32 @@ void escalonador::roundrobin(int quantum)
                 break;
             }
         }
+
+        // Adiciona o elemento que foi executado caso ainda reste processamento a ser feito
+        if(p_temp.restante != 0 and p_temp.id != -1)
+            fila_rr.push(p_temp);
+        else {
+            if(p_temp.id != -1) {
+                p_temp.final_execucao = tempo_execucao;
+                // adiciona o processo aos finalizados
+                processos_finalizados.push_back(p_temp);
+            }
+        }
+        // caso a cpu fique em tempo ocioso (chegada do proximo processo eh maior que o tempo de execucao)
+        // atualiza o tempo de execucao para a chegada do proximo processo
+        if(fila_rr.empty() and !(pq.empty())) {
+            topo_fila = pq.top();
+            tempo_execucao = topo_fila.chegada;
+            fila_rr.push(topo_fila);
+            pq.pop();
+        }
+
         // caso a fila esteja vazia deve encerrar o loop
         if(fila_rr.empty())
             break;
 
         p_temp = fila_rr.front();
+
         // verifica se eh o inicio da exec do processo
         if(p_temp.inicio_execucao == -1) {
             p_temp.inicio_execucao = tempo_execucao;
@@ -304,15 +339,6 @@ void escalonador::roundrobin(int quantum)
             p_temp.restante = 0;
         }
         arq_temp.push_back(linha_temp);
-        // caso ja tenha executado o processo ate o fim, nao o coloca na fila de pronto novamente
-        if(p_temp.restante != 0)
-            fila_rr.push(p_temp);
-        else {
-            p_temp.final_execucao = tempo_execucao;
-            // adiciona o processo aos finalizados
-            processos_finalizados.push_back(p_temp);
-        }
-         
     }
     // gera as estatisticas
     for(int i=0; i<processos_finalizados.size(); i++) {
