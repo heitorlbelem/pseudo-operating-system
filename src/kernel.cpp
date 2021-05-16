@@ -88,6 +88,7 @@ void kernel::verifica_entrada(int entrada, string arquivo)
             gerenciador_entrada_saida = GerenciadorES();
             setGerenciadorES(gerenciador_entrada_saida);
             gerenciador_entrada_saida.imprimeDistanciaPercorrida(arquivo);
+            set_modo_operacao(3);
             break;
         default:
             cout << "Tipo de arquivo incorreto!" << endl;
