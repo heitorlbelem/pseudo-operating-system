@@ -132,14 +132,13 @@ void kernel::gerencia_memoria() {
     g_memoria.fifo();
     // SEGUNDA CHANCE
     g_memoria.sc();
-
     // LRU
-    //g_memoria.lru();
+    g_memoria.lru();
 
     estatisticas_paginacao result;
     result = g_memoria.get_estatisticas();
     cout << "FIFO: " << result.fifo_pf << endl;
     cout << "SC: " << result.sc_pf << endl;
-    //cout << "LRU " << result.lru_pf << endl;
+    cout << "LRU " << result.lru_pf << endl;
 
 }

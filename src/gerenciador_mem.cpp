@@ -2,7 +2,6 @@
 
 int find_sc(vector<pair<int, int>> &elements, int current) {
 
-    vector<int> removable_frames;
     pair<int, int> aux;
     // percorre todos os frames que estão na memória
     for(int i=0; i < elements.size(); i++) {
@@ -25,9 +24,31 @@ int find_sc(vector<pair<int, int>> &elements, int current) {
             elements.push_back(aux);
         }
     }
-    
+
     return 0;
 
+}
+
+int find_lru(vector<pair<int,int>> &elements, int current) {
+    
+    int min, min_pos = 0;
+    if(elements.size() > 0) {
+        min = elements[0].second;
+    }
+
+    for(int i=0; i<elements.size(); i++) {
+        if(elements[i].first == current) {
+            elements[i].second++;
+            return -1;
+        }
+
+        if(elements[i].second < min) {
+            min = elements[i].second;
+            min_pos = i;
+        }
+    }
+    
+    return min_pos;
 }
 
 gerenciador_mem::gerenciador_mem(){}
@@ -145,5 +166,37 @@ void gerenciador_mem::sc() {
     estat.sc_pf = page_fault;
     set_estatisticas(estat);
 
+}
+
+void gerenciador_mem::lru() {
+    estatisticas_paginacao estat;
+    int page_fault = 0;
+    int current_page;
+    int found;
+
+    vector<pair<int,int>> frames;
+
+    for(int i=0; i<pages.size(); i++) {
+        current_page = pages[i];
+
+        found = find_lru(frames, current_page);
+        if(frames.size() < qt_frames) {
+            if(found != -1) {
+                page_fault++;
+                frames.push_back(make_pair(current_page, 0));
+            }
+        }
+        else {
+            if(found != -1) {
+                page_fault++;
+                frames.erase(frames.begin() + found);
+                frames.push_back(make_pair(current_page, 0));
+            }
+        }
+    }
+
+    estat = get_estatisticas();
+    estat.lru_pf = page_fault;
+    set_estatisticas(estat);
 }
 
