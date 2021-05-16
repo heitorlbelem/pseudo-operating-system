@@ -37,11 +37,13 @@ int find_lru(vector<pair<int,int>> &elements, int current) {
     }
 
     for(int i=0; i<elements.size(); i++) {
+        // se achou a página, incrementa o contador de referencias dela e retorna
         if(elements[i].first == current) {
             elements[i].second++;
             return -1;
         }
-
+        // se não achar, faz a comparação 1 a 1 ate achar a página que contem o menor numero de referencias
+        // e então retorna a posição dela
         if(elements[i].second < min) {
             min = elements[i].second;
             min_pos = i;
@@ -179,14 +181,19 @@ void gerenciador_mem::lru() {
         current_page = pages[i];
 
         found = find_lru(frames, current_page);
+        // se ainda houver espaço na memória
         if(frames.size() < qt_frames) {
+            // se não achar a pagina, adiciona a atual e incrementa o contador de page fault
             if(found != -1) {
                 page_fault++;
                 frames.push_back(make_pair(current_page, 0));
             }
         }
+        // se a memória estiver cheia
         else {
+            // se não achar a página atual na memória
             if(found != -1) {
+                // incrementa contador de page fault, remove a página que tem o menor numero de referencias e adiciona a página atual no seu lugar.
                 page_fault++;
                 frames.erase(frames.begin() + found);
                 frames.push_back(make_pair(current_page, 0));
