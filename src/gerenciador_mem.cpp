@@ -131,7 +131,6 @@ void gerenciador_mem::sc() {
 
     int page_fault = 0;
     int found;
-    int max_references = 0;
     vector<pair<int,int>> frames;
     estatisticas_paginacao estat;
 

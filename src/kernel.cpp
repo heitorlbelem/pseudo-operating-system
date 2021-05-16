@@ -139,6 +139,6 @@ void kernel::gerencia_memoria() {
     result = g_memoria.get_estatisticas();
     cout << "FIFO: " << result.fifo_pf << endl;
     cout << "SC: " << result.sc_pf << endl;
-    cout << "LRU " << result.lru_pf << endl;
+    cout << "LRU: " << result.lru_pf << endl;
 
 }
