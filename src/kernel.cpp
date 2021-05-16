@@ -88,7 +88,6 @@ void kernel::verifica_entrada(int entrada, string arquivo)
             gerenciador_entrada_saida = GerenciadorES();
             gerenciador_entrada_saida.set_nome_arquivo(arquivo);
             setGerenciadorES(gerenciador_entrada_saida);
-            gerenciador_entrada_saida.imprimeDistanciaPercorrida(arquivo);
             set_modo_operacao(3);
             break;
         default:
