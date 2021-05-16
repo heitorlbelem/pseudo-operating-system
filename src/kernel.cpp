@@ -86,8 +86,9 @@ void kernel::verifica_entrada(int entrada, string arquivo)
         // gerenciamneto de E/S
         // chamar funcao de ler arquivo de processos
             gerenciador_entrada_saida = GerenciadorES();
+            gerenciador_entrada_saida.set_nome_arquivo(arquivo);
             setGerenciadorES(gerenciador_entrada_saida);
-            gerenciador_entrada_saida.imprimeDistanciaPercorrida(arquivo);
+            set_modo_operacao(3);
             break;
         default:
             cout << "Tipo de arquivo incorreto!" << endl;
@@ -105,7 +106,7 @@ void kernel::verifica_modo_op(void)
             gerencia_memoria();
             break;
         case 3:
-        // gerenciamneto de E/S
+            gerencia_es();
             break;
         default:
             cout << "Tipo de arquivo incorreto!" << endl;
@@ -127,7 +128,8 @@ void kernel::gerencia_processos()
 
 }
 
-void kernel::gerencia_memoria() {
+void kernel::gerencia_memoria()
+{
     //FIFO
     g_memoria.fifo();
     // SEGUNDA CHANCE
@@ -141,4 +143,13 @@ void kernel::gerencia_memoria() {
     cout << "SC: " << result.sc_pf << endl;
     cout << "LRU: " << result.lru_pf << endl;
 
+}
+
+void kernel::gerencia_es()
+{
+    string arq;
+    // pega o nome do arquivo
+    arq = gerenciadorES_.get_nome_arquivo();
+    // Executa ES
+    gerenciadorES_.imprimeDistanciaPercorrida(arq);
 }
