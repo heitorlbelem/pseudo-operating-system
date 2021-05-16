@@ -1,36 +1,32 @@
 #include "gerenciador_mem.hpp"
 
-void reset_bit_R(vector<pair<int, int>> &elements) {
-    for(int i=0; i<elements.size(); i++) {
-        elements[i].second = 0; 
-    }
-}
-
 int find_sc(vector<pair<int, int>> &elements, int current) {
 
     vector<int> removable_frames;
+    pair<int, int> aux;
     // percorre todos os frames que estão na memória
     for(int i=0; i < elements.size(); i++) {
 
-        // se encontrar o frame que está para ser inserido, retorna -1 pois não
-        // precisa remover nenhum para colocar o atual. (NÃO TEM PAGE FAULT)
+        // se encontrar a página na memória, atualiza o contador de referencias (bit R),
+        // remove o elemento da atual posição e coloca no final da fila
         if(elements[i].first == current) {
-            elements[i].second = 2;
+            aux = make_pair(elements[i].first, 2);
+            elements.erase(elements.begin());
+            elements.push_back(aux);
             return -1;
         }
-        elements[i].second--;
-        // se não for o mesmo frame que quer adicionar, verifica o bit R
-        // se for 0, adiciona a posição do frame na lista de valores que podem ser removidos
-        if(elements[i].second == 0) {
-            removable_frames.push_back(i);
+
+        // se não achar, decrementa o contador de referências (bit R) e reinsere a página
+        // no final da fila
+        if(elements[i].second > 0){
+            elements[i].second--;
+            aux = elements[i];
+            elements.erase(elements.begin());
+            elements.push_back(aux);
         }
-
     }
-
-    if(removable_frames.size() == 0)
-        return 0;
-
-    return removable_frames[0];
+    
+    return 0;
 
 }
 
@@ -113,7 +109,7 @@ void gerenciador_mem::fifo() {
 void gerenciador_mem::sc() {
 
     int page_fault = 0;
-    int found = -1;
+    int found;
     int max_references = 0;
     vector<pair<int,int>> frames;
     estatisticas_paginacao estat;
@@ -126,10 +122,11 @@ void gerenciador_mem::sc() {
 
         // se a memoria estiver cheia, remove o frame mais antigo
         if(frames.size() == qt_frames){
+            // se não achou a página na memória, incrementa page fault, remove frame antigo e adiciona o novo
             if (found != -1) {
                 page_fault++;
                 frames.erase(frames.begin() + found);
-                frames.push_back(make_pair(current_page, 2));
+                frames.push_back(make_pair(current_page, 0));
             }
         }
         // se ainda tiver espaço livre na memória
@@ -137,7 +134,7 @@ void gerenciador_mem::sc() {
             // se não encontrou a página na memória, incrementa o page fault e adiciona a página nova na memória
             if(found != -1) {
                 page_fault++;
-                frames.push_back(make_pair(current_page, 2));
+                frames.push_back(make_pair(current_page, 0));
             }
         }
 
