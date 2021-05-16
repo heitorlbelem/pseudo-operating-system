@@ -23,6 +23,7 @@ class GerenciadorES {
     
     private:
     int tamanhoDisco;
+    std::string nome_arq;
     public:
     GerenciadorES(); // construtor
     ~GerenciadorES(); // destrutor
@@ -32,6 +33,11 @@ class GerenciadorES {
         Imprime na tela distâncias percorridas com diferentes algoritmos.
     */
     void imprimeDistanciaPercorrida(std::string);
+    /* Seta o nome do arquivo na string da classe */
+    void set_nome_arquivo(std::string);
+
+    /* retorna o nome do arquivo da classe */
+    std::string get_nome_arquivo(void);
 };
 
 /*

@@ -141,3 +141,14 @@ void ordenaSCAN(std::vector<int>& vector_ordenado, std::vector<int> vector_entra
     vector_entrada.insert(it_endereco_inicial, 0);
     vector_ordenado = vector_entrada;
 }
+
+
+void GerenciadorES::set_nome_arquivo(std::string str)
+{
+    nome_arq = str;
+}
+
+std::string GerenciadorES::get_nome_arquivo()
+{
+    return nome_arq;
+}

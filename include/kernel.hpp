@@ -42,8 +42,9 @@ class kernel {
     // metodos diversos
     void verifica_entrada(int , string);
     void verifica_modo_op(void);
-    void gerencia_processos();
-    void gerencia_memoria();
+    void gerencia_processos(void);
+    void gerencia_memoria(void);
+    void gerencia_es(void);
 };
 
 
