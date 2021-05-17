@@ -3,6 +3,7 @@
 #include <fstream>
 #include <streambuf>
 #include <iostream>
+#include <ctype.h>
 #include <vector>
 #include <cstdlib>
 #include <bits/stdc++.h>
@@ -44,9 +45,14 @@ void GerenciadorES::imprimeDistanciaPercorrida(std::string nome_arquivo )
         numero_temporario = atoi(palavra_temporaria.c_str());
         enderecos_cilindros_listados.push_back(numero_temporario);
         s.erase(0, pos + delimitador.length());
+        std::cout << numero_temporario << std::endl;
     }
+    // Lidando caso o último caractere do arquivo seja uma quebra de linha
     numero_temporario = atoi(s.c_str());
-    enderecos_cilindros_listados.push_back(numero_temporario);
+    if (numero_temporario == 0 && s == "0")
+    {
+        std::cout << "pão: " << numero_temporario << "!" << std::endl        enderecos_cilindros_listados.push_back(numero_temporario);
+    }
 
     tamanho_disco = enderecos_cilindros_listados.at(0);
     enderecos_cilindros_listados.erase(enderecos_cilindros_listados.begin());
@@ -82,6 +88,7 @@ int calculaDistanciaPercorrida(std::vector<int> vector_caminho_percorrido)
         it != vector_caminho_percorrido.end(); 
         ++it) {
         endereco_cilindro_atual = *it;
+
         if( ultimo_endereco_visitado == -1)
         {
             ultimo_endereco_visitado = endereco_cilindro_atual;
@@ -90,6 +97,7 @@ int calculaDistanciaPercorrida(std::vector<int> vector_caminho_percorrido)
             ultimo_endereco_visitado = endereco_cilindro_atual;
         }
     }
+    std::cout << "Terminou" << std::endl;
     return distancia_percorrida;
 
 }
