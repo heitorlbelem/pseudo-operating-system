@@ -51,7 +51,7 @@ void GerenciadorES::imprimeDistanciaPercorrida(std::string nome_arquivo )
     numero_temporario = atoi(s.c_str());
     if (numero_temporario == 0 && s == "0")
     {
-        std::cout << "pão: " << numero_temporario << "!" << std::endl        enderecos_cilindros_listados.push_back(numero_temporario);
+        std::cout << "pão: " << numero_temporario << "!" << std::endl;        enderecos_cilindros_listados.push_back(numero_temporario);
     }
 
     tamanho_disco = enderecos_cilindros_listados.at(0);
