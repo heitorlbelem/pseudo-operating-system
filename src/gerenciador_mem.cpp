@@ -3,28 +3,36 @@
 int find_sc(vector<pair<int, int>> &elements, int current) {
 
     pair<int, int> aux;
+    bool found = false;
+    int remove_pos = -1;
+    int initial_size = elements.size();
     // percorre todos os frames que estão na memória
     for(int i=0; i < elements.size(); i++) {
 
         // se encontrar a página na memória, atualiza o contador de referencias (bit R),
-        // remove o elemento da atual posição e coloca no final da fila
+        // seta a flag para true indicando que encontrou e passa para o próximo frame para atualizar suas referências
         if(elements[i].first == current) {
-            aux = make_pair(elements[i].first, 2);
-            elements.erase(elements.begin());
-            elements.push_back(aux);
-            return -1;
+            elements[i].second = 3;
+            found = true;
+            continue;       
         }
 
-        // se não achar, decrementa o contador de referências (bit R) e reinsere a página
-        // no final da fila
+        // se o bit R for 0, então salva a posição que deve ser removida da memória
+        if(elements[i].second == 0) {
+            if(remove_pos == -1)
+                remove_pos = i;
+        }
+
+        // se ainda for maior que 0, então deve atualizar o bit R e dar uma "segunda chance" para o frame
         if(elements[i].second > 0){
             elements[i].second--;
-            aux = elements[i];
-            elements.erase(elements.begin());
-            elements.push_back(aux);
         }
     }
 
+    if(found) return -1;
+    if(remove_pos != -1) return remove_pos;
+
+    // se todas as páginas possuírem referências, então age como um FIFO e remove a página mais antiga
     return 0;
 
 }
@@ -148,7 +156,7 @@ void gerenciador_mem::sc() {
             if (found != -1) {
                 page_fault++;
                 frames.erase(frames.begin() + found);
-                frames.push_back(make_pair(current_page, 0));
+                frames.push_back(make_pair(current_page, 3));
             }
         }
         // se ainda tiver espaço livre na memória
@@ -156,7 +164,7 @@ void gerenciador_mem::sc() {
             // se não encontrou a página na memória, incrementa o page fault e adiciona a página nova na memória
             if(found != -1) {
                 page_fault++;
-                frames.push_back(make_pair(current_page, 0));
+                frames.push_back(make_pair(current_page, 3));
             }
         }
 
